@@ -1,0 +1,94 @@
+---
+title: "Pretest2024 CS102"
+author: "Kent Hervey D. Gener BSIT2-B"
+date: "2024-01-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+```{r}
+library(rvest)
+library(dplyr)
+library(polite)
+library(kableExtra)
+library(purrr) 
+
+polite::use_manners(save_as = 'polite_scrape.R')
+
+url_category1 <- 'https://www.amazon.com/s?k=mechanical+keyboard&i=todays-deals&crid=217PSLLJ3ZC8L&sprefix=mechanica%2Ctodays-deals%2C990&ref=nb_sb_ss_ts-doa-p_2_9'
+
+url_category2 <- 'https://www.amazon.com/s?k=external+hard+drive&i=todays-deals&crid=1X4CF2W4CEQ5G&sprefix=external+hard%2Caps%2C188&ref=nb_sb_ss_ts-doa-p_1_14'
+
+scrape_product <- function(url) {
+  session <- bow(url, user_agent = "Educational")
+  
+  product_data <- scrape(session) %>%
+    html_nodes('div.s-result-item')
+  
+
+  description <- product_data %>%
+    html_nodes('span.a-size-medium.a-color-base.a-text-normal') %>%
+    html_text() %>%
+    trimws()
+  
+  price <- product_data %>%
+    html_nodes('span.a-offscreen') %>%
+    html_text() %>%
+    trimws()
+  
+  reviews <- product_data %>%
+    html_nodes('span.a-size-base.s-underline-text') %>%
+    html_text() %>%
+    trimws()
+  
+  stars <- product_data %>%
+    html_nodes('span.a-icon-alt') %>%
+    html_text() %>%
+    trimws()
+  
+  max_length <- max(length(description), length(price), length(reviews), length(stars))
+  
+  description <- c(description, rep(NA, max_length - length(description)))
+  price <- c(price, rep(NA, max_length - length(price)))
+  reviews <- c(reviews, rep(NA, max_length - length(reviews)))
+  stars <- c(stars, rep(NA, max_length - length(stars)))
+  
+  product_df <- data.frame(description, price, reviews, stars)
+  
+  return(product_df)
+}
+
+
+result_df_category1 <- map_dfr(url_category1, ~ scrape_product(.x))
+result_df_category2 <- map_dfr(url_category2, ~ scrape_product(.x))
+
+cat("Category 1:\n")
+kable(result_df_category1)
+
+cat("\nCategory 2:\n")
+kable(result_df_category2)
+```
