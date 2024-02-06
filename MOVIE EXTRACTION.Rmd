@@ -79,6 +79,6 @@ imdb_url <- "https://www.imdb.com/title/tt15314262/reviews/?ref_=tt_ov_rt"
 all_reviews <- scrape_multiple_pages(imdb_url)
 
 
-print(head(all_reviews))
+View(all_reviews)
 
 ```
