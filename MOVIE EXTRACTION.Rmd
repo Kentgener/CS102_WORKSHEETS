@@ -1,0 +1,84 @@
+---
+title: "MOVIE EXTRACTION"
+author: "Kent Hervey D. Gener BSIT2-B"
+date: "2024-02-06"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{R}
+library(rvest)
+library(dplyr)
+
+scrape_reviews <- function(url) {
+  page <- read_html(url)
+ 
+  user <- page %>% html_nodes(".display-name-link") %>% html_text()
+  date <- page %>% html_nodes(".review-date") %>% html_text()
+  rating <- page %>% html_nodes(".rating-other-user-rating") %>% html_text()
+  comment_title <- page %>% html_nodes(".title") %>% html_text()
+  comment <- page %>% html_nodes(".text.show-more__control") %>% html_text()
+  
+  reviews <- data.frame(
+    User = head(user, 300),
+    Date = head(date, 300),
+    Rating = head(rating, 300),
+    Title = head(comment_title, 300),
+    Comment = head(comment, 300)
+  )
+  
+  return(reviews)
+}
+
+scrape_multiple_pages <- function(base_url) {
+  all_reviews <- data.frame()
+  reviews_per_page <- 10
+  total_reviews_target <- 300
+  num_pages <- ceiling(total_reviews_target / reviews_per_page)
+ 
+  for (page_num in 1:num_pages) {
+    url <- paste0(base_url, "&start=", (page_num - 1) * reviews_per_page)
+    reviews <- scrape_reviews(url)
+    all_reviews <- bind_rows(all_reviews, reviews)
+   
+    if (nrow(all_reviews) >= total_reviews_target) {
+      break
+    }
+  }
+ 
+  return(all_reviews)
+}
+
+
+imdb_url <- "https://www.imdb.com/title/tt15314262/reviews/?ref_=tt_ov_rt"
+all_reviews <- scrape_multiple_pages(imdb_url)
+
+
+print(head(all_reviews))
+
+```
