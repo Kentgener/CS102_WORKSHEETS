@@ -1,0 +1,83 @@
+---
+title: "10Movies"
+author: "Kent Hervey D. Gener BSIT2-B"
+date: "2024-02-13"
+output: htmldocument
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+library(rvest)
+library(dplyr)
+library(polite)
+
+scrape <- function(url, target = 300) {
+  reviews <- data.frame()
+
+  per_page <- 10
+  pages <- ceiling(target / per_page)
+
+  for (i in 1:pages) {
+    page_url <- paste0(url, "&start=", (i - 1) * per_page)
+    page <- read_html(page_url)
+
+    rev <- data.frame(
+      user = page %>% html_nodes(".display-name-link") %>% html_text() %>% head(per_page),
+      date = page %>% html_nodes(".review-date") %>% html_text() %>% head(per_page),
+      rating = page %>% html_nodes(".rating-other-user-rating") %>% html_text() %>% head(per_page),
+      comment = page %>% html_nodes(".text.show-more__control") %>% html_text() %>% head(per_page)
+    )
+
+    reviews <- bind_rows(reviews, rev)
+
+    if (nrow(reviews) >= target) break
+  }
+
+  return(reviews)
+}
+
+movies <- c(
+  "https://www.imdb.com/title/tt15314262/reviews/?ref_=tt_ov_rt",
+  "https://www.imdb.com/title/tt0111161/reviews/?ref_=tt_ql_2",
+  "https://www.imdb.com/title/tt15009428/reviews/?ref_=tt_ql_2",
+  "https://www.imdb.com/title/tt14230458/reviews/?ref_=tt_ql_2",
+  "https://www.imdb.com/title/tt17351924/reviews/?ref_=tt_ql_2",
+  "https://www.imdb.com/title/tt26047818/reviews/?ref_=tt_ql_2",
+  "https://www.imdb.com/title/tt8310486/reviews/?ref_=tt_ql_2",
+  "https://www.imdb.com/title/tt13560574/reviews/?ref_=tt_ql_2",
+  "https://www.imdb.com/title/tt28066777/reviews/?ref_=tt_ql_2",
+  "https://www.imdb.com/title/tt2582802/reviews/?ref=ttql2"
+)
+
+all_revs <- list()
+
+for (mov_url in movies) {
+  revs <- scrape(mov_url)
+  all_revs[[mov_url]] <- revs
+}
+
+print(all_revs)
+
+```
