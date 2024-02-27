@@ -41,14 +41,12 @@ scrape_reviews <- function(url) {
   user <- page %>% html_nodes(".display-name-link") %>% html_text()
   date <- page %>% html_nodes(".review-date") %>% html_text()
   rating <- page %>% html_nodes(".rating-other-user-rating") %>% html_text()
-  comment_title <- page %>% html_nodes(".title") %>% html_text()
   comment <- page %>% html_nodes(".text.show-more__control") %>% html_text()
   
   reviews <- data.frame(
     User = head(user, 300),
     Date = head(date, 300),
     Rating = head(rating, 300),
-    Title = head(comment_title, 300),
     Comment = head(comment, 300)
   )
   
@@ -79,6 +77,6 @@ imdb_url <- "https://www.imdb.com/title/tt15314262/reviews/?ref_=tt_ov_rt"
 all_reviews <- scrape_multiple_pages(imdb_url)
 
 
-View(all_reviews)
+print(all_reviews)
 
 ```
