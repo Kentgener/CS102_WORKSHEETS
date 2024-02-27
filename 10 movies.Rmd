@@ -6,7 +6,7 @@ output: htmldocument
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::optschunk$set(echo = TRUE)
 ```
 
 ## R Markdown
