@@ -1,0 +1,119 @@
+---
+title: "Practical1"
+author: "Kent Hervey D. Gener BSIT2-B"
+date: "2024-03-05"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+# A
+```{r}
+warpbreaks
+```
+# 1.
+```{r}
+numeric_cols <- sapply(warpbreaks, is.numeric)
+integer_cols <- sapply(warpbreaks, is.integer)
+print(numeric_cols)
+print(integer_cols)
+```
+
+# 2.
+```{r}
+warpbreaks[, numeric_cols] <- lapply(warpbreaks[, numeric_cols], as.integer)
+print(warpbreaks)
+```
+# 3.
+
+# B.
+# 1.
+```{r}
+linesile <- readLines("D:/CS102/exampleFile.txt")
+print(linesile)
+
+```
+
+# 2.
+```{r}
+linesile <- "D:/CS102/exampleFile.txt"
+lines <- readLines(linesile)
+comments <- lines[grepl("^#", lines)]
+data <- lines[!grepl("^#", lines)]
+
+print(comments)
+print(data)
+```
+
+# 3.
+```{r}
+date <- regmatches(lines[grepl("^#", lines)][1], regexpr("\\d{4}-\\d{2}-\\d{2}", lines[grepl("^#", lines)][1]))
+
+print(date)
+```
+
+# 4.
+# A.
+```{r}
+data_lines <- lines[!grepl("^#", lines)]
+
+data_matrix <- sapply(data_lines, function(line) unlist(strsplit(line, ";")))
+
+print(data_matrix)
+```
+
+# B.
+```{r}
+splitdata <- strsplit(lines[!grepl("^#", lines)], ";")
+
+maxfields <- max(lengths(splitdata))
+
+maxnum <- t(sapply(splitdata, function(x) c(x, rep(NA, maxfields - length(x)))))
+
+print(maxnum)
+```
+
+# C.
+```{r}
+data <- strsplit(lines[!grepl("^#", lines)], ";")
+
+max_fields <- max(lengths(data))
+
+matrix_data <- matrix(unlist(lapply(data, function(x) c(x, rep(NA, max_fields - length(x))))), ncol = max_fields, byrow = TRUE)
+
+print(matrix_data)
+```
+
+# D.
+```{r}
+comment_lines <- lines[grepl("^#", lines)][2:4]
+
+field_names <- unlist(strsplit(comment_lines, ";"))
+
+colnames(matrix_data) <- field_names
+
+print(matrix_data)
+```
