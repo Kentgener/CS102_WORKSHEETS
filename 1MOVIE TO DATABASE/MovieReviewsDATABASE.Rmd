@@ -42,3 +42,30 @@ connection <- dbConnect(RMariaDB::MariaDB(),
                         password = '')
 
 ```
+
+```{r}
+dbListTables(connection)
+```
+
+```{r}
+dbListFields(connection,"1_movie")
+```
+
+```{r}
+dbWriteTable(conn = connection, name = "1_movie", value = onemoviereviews, append = TRUE)
+```
+
+```{r}
+
+empi_data <- dbGetQuery(connection, "SELECT * FROM moviereviews.1_movie")
+
+glimpse(empi_data)
+```
+
+```{r}
+empi_data[c(1:10),]
+```
+
+```{r}
+dbDisconnect(connection)
+```
