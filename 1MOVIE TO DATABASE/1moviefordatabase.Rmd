@@ -1,0 +1,76 @@
+---
+title: "1MovieForDataBase"
+author: "Kent Hervey D. Gener BSIT2-B"
+date: "2024-03-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+library(rvest)
+library(dplyr)
+
+scrape_movie_reviews <- function(url) {
+  reviews <- data.frame()
+
+  
+  movie_title <- "Dune: Part Two"
+
+  per_page <- 10
+  pages <- 1  
+
+  page_url <- paste0(url, "&start=0")
+  page <- read_html(page_url)
+
+  rev <- data.frame(
+    title = movie_title,
+    author = page %>% html_nodes(".display-name-link") %>% html_text() %>% head(per_page),
+    review_title = page %>% html_nodes(".title") %>% html_text() %>% head(per_page),
+    date = page %>% html_nodes(".review-date") %>% html_text() %>% head(per_page),
+    rating = page %>% html_nodes(".rating-other-user-rating") %>% html_text() %>% head(per_page),
+    comment = page %>% html_nodes(".text.show-more__control") %>% html_text() %>% head(per_page)
+  )
+
+  reviews <- bind_rows(reviews, rev)
+
+  return(reviews)
+}
+
+url <- "https://www.imdb.com/title/tt15239678/reviews/?ref_=tt_ql_2"
+
+onemoviereviews <- scrape_movie_reviews(url)
+
+onemoviereviews$review_title <- gsub("\n", "", onemoviereviews$review_title)
+
+onemoviereviews$date <- as.Date(onemoviereviews$date, format = "%d %B %Y")
+
+onemoviereviews$rating <- gsub("\\D", "", onemoviereviews$rating)
+
+onemoviereviews$rating <- as.numeric(substr(onemoviereviews$rating, 1, nchar(onemoviereviews$rating) - 2))
+
+onemoviereviews <- na.omit(onemoviereviews)
+
+print(onemoviereviews)
+```
