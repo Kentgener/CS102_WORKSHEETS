@@ -36,7 +36,7 @@ scrape_movie_reviews <- function(url) {
   reviews <- data.frame()
 
   
-  movie_title <- "Dune: Part Two"
+  movie_title <- "dune: part two"
 
   per_page <- 10
   pages <- 1  
@@ -62,7 +62,9 @@ url <- "https://www.imdb.com/title/tt15239678/reviews/?ref_=tt_ql_2"
 
 onemoviereviews <- scrape_movie_reviews(url)
 
-onemoviereviews$review_title <- gsub("\n", "", onemoviereviews$review_title)
+onemoviereviews$review_title <- gsub("\n", "", tolower(onemoviereviews$review_title))
+onemoviereviews$author <- tolower(onemoviereviews$author)
+onemoviereviews$comment <- tolower(onemoviereviews$comment)
 
 onemoviereviews$date <- as.Date(onemoviereviews$date, format = "%d %B %Y")
 
@@ -70,7 +72,10 @@ onemoviereviews$rating <- gsub("\\D", "", onemoviereviews$rating)
 
 onemoviereviews$rating <- as.numeric(substr(onemoviereviews$rating, 1, nchar(onemoviereviews$rating) - 2))
 
+
+
 onemoviereviews <- na.omit(onemoviereviews)
 
 print(onemoviereviews)
+
 ```
